@@ -9,7 +9,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents().all()
 
-client = commands.Bot(command_prefix='.', intents=intents)
+client = commands.Bot(command_prefix='.', intents=intents, help_command=None)
 
 
 # start
