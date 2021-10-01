@@ -3,6 +3,7 @@ import discord
 import os
 import youtube_dl
 import asyncio
+from datetime import datetime
 from youtube_dl import YoutubeDL
 from discord.ext import commands
 from discord.utils import get
@@ -29,7 +30,10 @@ async def on_ready():
 # bem-vindo
 @client.event
 async def on_member_join(member):
-    await client.get_channel(892962718129221654).send(f'Salve {member.mention}. Bem-vindo(a) à realeza. :sunglasses:')
+    embedvar = discord.Embed(color=0x00B2E3, timestamp=datetime.now())
+    embedvar.add_field(name='Aumentamos a tropa',
+                       value=f'{member.mention} bem-vindo(a) à Realeza. :crown: :crocodile:')
+    await client.get_channel(892962718129221654).send(embed=embedvar)
 
 
 # comando oi
