@@ -21,8 +21,9 @@ client = commands.Bot(command_prefix='.', intents=intents, help_command=None)
 @client.event
 async def on_ready():
     print(f'{client.user.name} está no discord.')
-    game = discord.Game("o crocodilo no peito")
-    await client.change_presence(status=discord.Status.online, activity=game)
+    await client.change_presence(activity=discord.Activity(status=discord.Status.online,
+                                                           type=discord.ActivityType.listening,
+                                                           name='\".help\"'))
 
 
 # bem-vindo
@@ -198,4 +199,3 @@ async def stop(ctx):
 
 if __name__ == '__main__':
     client.run(TOKEN)
-    
