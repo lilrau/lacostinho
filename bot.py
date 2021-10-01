@@ -1,7 +1,12 @@
 # bot.py
 import discord
 import os
+import youtube_dl
+import asyncio
+from youtube_dl import YoutubeDL
 from discord.ext import commands
+from discord.utils import get
+from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -53,24 +58,144 @@ async def clear(ctx):
     await ctx.channel.purge(limit=1000000)
 
 
+client.remove_command('help')
+
+
 # comando help
 @client.command()
-async def ajuda(ctx):
-    embedVar = discord.Embed(title="Comandos",
+async def help(ctx):
+    embedvar = discord.Embed(title="Comandos",
                              description="",
                              color=0x9600FF,
                              url='https://github.com/lilrau/lacostinho/blob/main/comandos')
-    embedVar.add_field(name="help", value="Mostra esta mensagem.", inline=False)
-    embedVar.add_field(name="oi", value="Diga \"oi\" para o Lacostinho!", inline=False)
-    embedVar.add_field(name="gostosa", value="Mostra uma gostosa.", inline=False)
-    embedVar.add_field(name="nenem", value="Mostra um neném.", inline=False)
-    embedVar.add_field(name="purge", value="Limpa as mensagens do canal.", inline=False)
-    embedVar.set_footer(
-        text="Atualizado por raulzinho  •  30/09/2021",
+    embedvar.add_field(name="help", value="Mostra esta mensagem.\n ", inline=False)
+    embedvar.add_field(name="oi", value="Diga \"oi\" para o Lacostinho!\n ", inline=False)
+    embedvar.add_field(name="gostosa", value="Mostra uma gostosa.\n ", inline=False)
+    embedvar.add_field(name="nenem", value="Mostra um neném.\n ", inline=False)
+    embedvar.add_field(name="purge", value="Limpa as mensagens do canal.\n ", inline=False)
+    embedvar.add_field(name="join", value="Traz o bot para seu canal de voz.\n ", inline=False)
+    embedvar.add_field(name="leave", value="Retira o bot de seu canal de voz.\n ", inline=False)
+    embedvar.add_field(name="play", value="Toca a música escolhida.\n ", inline=False)
+    embedvar.add_field(name="pause", value="Pausa a música atual.\n ", inline=False)
+    embedvar.add_field(name="resume", value="Continua a música pausada.\n ", inline=False)
+    embedvar.add_field(name="stop", value="Para a música.\n ", inline=False)
+    embedvar.set_footer(
+        text="Atualizado por raulzinho  •  01/10/2021",
         icon_url='https://cdn.discordapp.com/attachments/709526517864202271/893127205822013520/image0.jpg')
-    embedVar.set_image(
+    embedvar.set_image(
         url='https://cdn.discordapp.com/attachments/709526517864202271/893142073220403220/comandos_bot_wpp.png')
-    await ctx.send(embed=embedVar)
+    await ctx.send(embed=embedvar)
 
 
-client.run(TOKEN)
+youtube_dl.utils.bug_reports_message = lambda: ''
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '26.136.136.218'  # vincular ao ipv4
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+        self.data = data
+        self.title = data.get('title')
+        self.url = ""
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+        if 'entries' in data:
+            # pega o primeiro item da playlist
+            data = data['entries'][0]
+        filename = data['title'] if stream else ytdl.prepare_filename(data)
+        return filename
+
+
+# comando join
+@client.command(name='join')
+async def join(ctx):
+    if not ctx.message.author.voice:
+        await ctx.send("{} não está em um canal de voz.".format(ctx.message.author.name))
+        return
+    else:
+        channel = ctx.message.author.voice.channel
+    await channel.connect()
+
+
+# comando leave
+@client.command(name='leave')
+async def leave(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_connected():
+        await voice_client.disconnect()
+    else:
+        await ctx.send("O bot não está conectado em um canal de voz.")
+
+
+# comando play
+@client.command()
+async def play(ctx, url):
+    ydl_options = {'format': 'bestaudio', 'noplaylist': 'True'}
+    ffmpeg_options = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
+    voice = get(client.voice_clients, guild=ctx.guild)
+
+    if not voice.is_playing():
+        with YoutubeDL(ydl_options) as ydl:
+            info = ydl.extract_info(url, download=False)
+        url = info['formats'][0]['url']
+        voice.play(FFmpegPCMAudio(url, **ffmpeg_options, executable='C:\\FFmpeg\\bin\\ffmpeg.exe'))
+        voice.is_playing()
+    else:
+        await ctx.send("Uma música já está sendo tocada.")
+        return
+
+
+# comando pause
+@client.command(name='pause')
+async def pause(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+        await voice_client.pause()
+    else:
+        await ctx.send("O bot não está tocando nada no momento.")
+
+
+# comando resume
+@client.command(name='resume')
+async def resume(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_paused():
+        await voice_client.resume()
+    else:
+        await ctx.send("O bot não estava tocando nada. Use o comando \".play\"")
+
+
+# comando stop
+@client.command(name='stop')
+async def stop(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+        await voice_client.stop()
+    else:
+        await ctx.send("O bot não está tocando nada no momento")
+
+
+if __name__ == '__main__':
+    client.run(TOKEN)
+    
