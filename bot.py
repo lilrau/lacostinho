@@ -16,6 +16,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents().all()
 
 client = commands.Bot(command_prefix='.', intents=intents, help_command=None)
+client.remove_command('help')
 
 
 # start
@@ -32,8 +33,9 @@ async def on_ready():
 async def on_member_join(member):
     embedvar = discord.Embed(color=0x00B2E3, timestamp=datetime.now())
     embedvar.add_field(name='Aumentamos a tropa',
-                       value=f'{member.mention} bem-vindo(a) à Realeza. :crown: :crocodile:')
-    await client.get_channel(892962718129221654).send(embed=embedvar)
+                       value=f'{member.mention} bem-vindo(a) à Realeza. :crown: :crocodile:')  # cria o embed
+    await client.get_channel(892962718129221654).send(embed=embedvar)  # envia o embed
+    await member.add_roles(member.guild.get_role(893618254466138162))  # adiciona o cargo
 
 
 # comando oi
@@ -61,9 +63,6 @@ async def nenem(ctx):
 @commands.has_permissions(manage_messages=True)
 async def clear(ctx):
     await ctx.channel.purge(limit=1000000)
-
-
-client.remove_command('help')
 
 
 # comando help
