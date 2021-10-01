@@ -1,6 +1,3 @@
-help
-  Mostra esta mensagem.
-
 oi
   Diga "oi" para o Lacostinho!
 
@@ -12,3 +9,21 @@ nenem
 
 purge
   Limpa as mensagens do canal.
+
+join
+  Traz o bot para seu canal de voz.
+
+leave
+  Retira o bot de seu canal de voz.
+
+play
+  Toca a música escolhida.
+
+pause
+  Pausa a música atual.
+
+resume
+  Continua a música pausada.
+
+stop
+  Para a música.
