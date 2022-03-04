@@ -1,5 +1,4 @@
 # bot.py
-
 import discord
 import os
 import youtube_dl
@@ -12,12 +11,12 @@ from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('DISCORD_TOKEN') # token fora do codigo por seguranca e vulnerabilidade
 
 intents = discord.Intents().all()
 
-client = commands.Bot(command_prefix='.', intents=intents, help_command=None)
-client.remove_command('help')
+client = commands.Bot(command_prefix='.', intents=intents, help_command=None) # prefixo "." para comandos
+client.remove_command('help') # remove o comando help (para colocar um personalizado posteriormente)
 
 
 # start
@@ -26,7 +25,7 @@ async def on_ready():
     print(f'{client.user.name} está no discord.')
     await client.change_presence(activity=discord.Activity(status=discord.Status.online,
                                                            type=discord.ActivityType.listening,
-                                                           name='\".help\"'))
+                                                           name='\".help\"')) # status no discord para o bot
 
 
 # bem-vindo
@@ -36,7 +35,7 @@ async def on_member_join(member):
     embedvar.add_field(name='Aumentamos a tropa',
                        value=f'{member.mention} bem-vindo(a) à Realeza. :crown: :crocodile:')  # cria o embed
     await client.get_channel(892962718129221654).send(embed=embedvar)  # envia o embed
-    await member.add_roles(member.guild.get_role(893618254466138162))  # adiciona o cargo
+    await member.add_roles(member.guild.get_role(893618254466138162))  # adiciona o cargo ao novo membro
 
 
 # comando oi
@@ -48,7 +47,8 @@ async def oi(ctx):
 # comando gostosa
 @client.command()
 async def gostosa(ctx):
-    await ctx.send('https://cdn.discordapp.com/attachments/709526517864202271/893121455523528734/image0.jpg')
+    await ctx.send('https://cdn.discordapp.com/attachments/709526517864202271/'
+                   '905535914699264030/2A98BF6F-E6DF-4034-9B6C-1F82DC6A3519.jpg')
     await ctx.send('Tem dono talarico safado. :face_with_symbols_over_mouth:')
 
 
@@ -104,7 +104,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '26.136.136.218'  # vincular ao ipv4
+    'source_address': '26.136.136.218'  # ipv4
 }
 
 ffmpeg_options = {
@@ -135,7 +135,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 # comando join
 @client.command(name='join')
 async def join(ctx):
-    if not ctx.message.author.voice:
+    if not ctx.message.author.voice: # erro usuario nao esta em um canal de voz
         await ctx.send("{} não está em um canal de voz.".format(ctx.message.author.name))
         return
     else:
@@ -149,11 +149,12 @@ async def leave(ctx):
     voice_client = ctx.message.guild.voice_client
     if voice_client.is_connected():
         await voice_client.disconnect()
-    else:
+    else: # erro bot nao esta em um canal de voz
         await ctx.send("O bot não está conectado em um canal de voz.")
 
 
 # comando play
+# necessita de ffmpeg (?)
 @client.command()
 async def play(ctx, url):
     ydl_options = {'format': 'bestaudio', 'noplaylist': 'True'}
@@ -166,7 +167,7 @@ async def play(ctx, url):
         url = info['formats'][0]['url']
         voice.play(FFmpegPCMAudio(url, **ffmpeg_options, executable='C:\\FFmpeg\\bin\\ffmpeg.exe'))
         voice.is_playing()
-    else:
+    else: # erro ja possui uma musica tocando
         await ctx.send("Uma música já está sendo tocada.")
         return
 
@@ -177,7 +178,7 @@ async def pause(ctx):
     voice_client = ctx.message.guild.voice_client
     if voice_client.is_playing():
         await voice_client.pause()
-    else:
+    else: # erro nao tem musica sendo tocada
         await ctx.send("O bot não está tocando nada no momento.")
 
 
@@ -187,8 +188,8 @@ async def resume(ctx):
     voice_client = ctx.message.guild.voice_client
     if voice_client.is_paused():
         await voice_client.resume()
-    else:
-        await ctx.send("O bot não estava tocando nada. Use o comando \".play\"")
+    else: # erro nao tem musica sendo tocada
+        await ctx.send("O bot não estava tocando nada. Use o comando *\".play\"*")
 
 
 # comando stop
@@ -197,9 +198,9 @@ async def stop(ctx):
     voice_client = ctx.message.guild.voice_client
     if voice_client.is_playing():
         await voice_client.stop()
-    else:
+    else:  # erro nao tem musica sendo tocada
         await ctx.send("O bot não está tocando nada no momento")
 
 
 if __name__ == '__main__':
-    client.run(TOKEN)
+    client.run(TOKEN) # token fora do codigo por seguranca e vulnerabilidade
