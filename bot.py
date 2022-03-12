@@ -104,7 +104,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '26.136.136.218'  # ipv4
+    'source_address': '00.000.000.000'  # ipv4
 }
 
 ffmpeg_options = {
