@@ -1,7 +1,7 @@
 # lacostinho
 Bot lacostinho
 
-Este bot foi/está sendo desenvolvido por Raul Souza(raulsscoc@hotmail.com). Você pode entrar em contato pelo Discord raulzinho#6550.
+Este bot foi/está sendo desenvolvido por Raul Souza(raulsscoc@hotmail.com). Você pode entrar em contato pelo Discord https://discordapp.com/users/246318073815105547.
 
 O código em questão não possui fins lucrativos e foi montado com base em conhecimentos pessoais e trechos retirados da comunidade, além dos documentos https://discordpy.readthedocs.io/en/latest/index.html e https://docs.python.org/3/contents.html.
 
